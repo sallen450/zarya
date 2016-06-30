@@ -4,7 +4,7 @@
   "description": "A simple CLI for scaffolding node test suite",
   "main": "index.js",
   "bin": {
-    "stest": "bin/stest"
+    "zarya": "bin/zarya"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
