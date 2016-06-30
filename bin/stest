@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+'use strict';
+
+require('commander')
+    .version(require('../package').version)
+    .usage('<command> [options]')
+    .command('init', 'init test dependencies')
+    .command('newcase', 'create a new test case')
+    .parse(process.argv);

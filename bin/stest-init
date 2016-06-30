@@ -1,0 +1,143 @@
+#!/usr/bin/env node
+/*eslint no-console: "off"*/
+'use strict';
+
+var exec = require('child_process').exec;
+var fs = require('fs');
+var path = require('path');
+
+var chalk = require('chalk');
+var ora = require('ora');
+var program = require('commander');
+
+program
+    .usage('');
+
+program.on('--help', function() {
+    console.log('  Examples:');
+    console.log();
+    console.log(chalk.gray('    # init node test dependencies'));
+    console.log('    $ souche_test init');
+});
+
+program.parse(process.argv);
+
+/**
+ * Padding
+ */
+console.log();
+process.on('exit', function() {
+    console.log();
+});
+
+function main() {
+    initTestFolder();
+    initMakefile();
+    initGitIgnore();
+    initMochaOpts();
+    initTestReadme();
+    initDependencyPackages();
+}
+
+main();
+
+/**
+ * partial function
+ */
+
+// create 'Makefile'
+function initMakefile() {
+    var fd = null;
+    var content = fs.readFileSync(path.join(__dirname, '../template/Makefile'), {
+        encoding: 'utf8'
+    });
+    var file = path.join(process.cwd(), './Makefile');
+
+    if (!fs.existsSync(file)) {
+        fd = fs.openSync(file, 'w');
+        fs.writeSync(fd, content);
+        fs.closeSync(fd);
+    } else {
+        fd = fs.openSync(file + '_test', 'w');
+        fs.writeSync(fd, content);
+        fs.closeSync(fd);
+
+        console.log(chalk.red('Makefile already exist, please add `Makefile_test` to `Makefile` manually.'));
+        console.log();
+    }
+}
+
+// if 'test' folder is exist, rename to 'test.bak'
+function initTestFolder() {
+    var folder = path.join(process.cwd(), './test');
+
+    if (fs.existsSync(folder)) {
+        fs.renameSync(folder, folder + '.bak');
+    }
+    fs.mkdirSync(folder);
+}
+
+// create 'mocha.opts',
+function initMochaOpts() {
+    var fd = null;
+    var folder = path.join(process.cwd(), './test');
+
+    fd = fs.openSync(folder + '/mocha.opts', 'w');
+    fs.closeSync(fd);
+}
+
+// ignore 'coverage' folder, add it to .gitignore
+function initGitIgnore() {
+    var fd = null;
+    var file = path.join(process.cwd(), './.gitignore');
+
+    if (fs.existsSync(file)) {
+        fs.writeFileSync(file, '\ncoverage', {
+            flag: 'a'
+        });
+    } else {
+        fd = fs.openSync(file, 'w');
+        fs.writeSync(fd, 'coverage');
+        fs.closeSync(fd);
+    }
+}
+
+// download dependencies npm packages
+function initDependencyPackages() {
+    var file = path.join(process.cwd(), './package.json');
+
+    if (!fs.existsSync(file)) {
+        console.log(chalk.red('package.json not found in current folder, create a new package.json or change current folder'));
+        console.log();
+    } else {
+        var spinner = ora('installing dependencies packages');
+        spinner.start();
+        exec('make init-test', function(err) {
+            spinner.stop();
+
+            if (err) {
+                console.log(chalk.red('install dependencies packages error, please run `make init-test` manually'));
+                console.log();
+            }
+
+            console.log(chalk.green('finished'));
+            console.log();
+        });
+    }
+}
+
+// init readme file
+function initTestReadme () {
+    var file = path.join(process.cwd(), './README.md');
+    var content = fs.readFileSync(path.join(__dirname, '../template/README.md'), {
+        encoding: 'utf8'
+    });
+
+    if (fs.existsSync(file)) {
+        fs.closeSync(fs.openSync(file, 'w'));
+    }
+
+    fs.writeFileSync(file, content, {
+        flag: 'a'
+    });
+}

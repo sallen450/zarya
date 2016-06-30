@@ -1,0 +1,75 @@
+#!/usr/bin/env node
+/*eslint no-console: "off"*/
+'use strict';
+
+var fs = require('fs');
+var path = require('path');
+
+var chalk = require('chalk');
+var moment = require('moment');
+var program = require('commander');
+var username = require('username');
+
+program
+    .usage('<test-case-name>');
+
+program.on('--help', function() {
+    console.log('  Examples:');
+    console.log();
+    console.log(chalk.gray('    # create a new test case file'));
+    console.log('    $ souche_test newcase index');
+});
+
+program.parse(process.argv);
+
+/**
+ * Padding
+ */
+console.log();
+process.on('exit', function() {
+    console.log();
+});
+
+function main() {
+    var basename = program.args[0];
+    if (!basename || typeof basename !== 'string' ) {
+        console.log(chalk.red('should input a name'));
+        console.log();
+        return;
+    }
+
+    var template = fs.readFileSync(path.join(__dirname, '../template/template.js'), {
+        encoding: 'utf8'
+    });
+    var content = compileTemplate(template);
+
+    // create unit/function test file
+    var files = [];
+    files.push(path.join(process.cwd(), `./${basename}.spec.js`));
+    files.push(path.join(process.cwd(), `./${basename}.func.js`));
+
+    files.forEach(function (file) {
+        if (fs.existsSync(file)) {
+            console.log(chalk.red('test file already exist'));
+            console.log();
+        } else {
+            fs.writeFileSync(file, content);
+        }
+    });
+}
+
+main();
+
+function compileTemplate (template) {
+    var content = template || '';
+
+    var user = username.sync();
+    var time = moment().format('YYYY-MM-DD HH:mm:ss');
+    var year = moment().format('YYYY');
+
+    content = content.replace(/\{\{user\}\}/g, user);
+    content = content.replace(/\{\{time\}\}/g, time);
+    content = content.replace(/\{\{year\}\}/g, year);
+
+    return content;
+}
