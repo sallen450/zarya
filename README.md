@@ -1,4 +1,4 @@
-# vue-cli
+# zarya
 
 A simple CLI for scaffolding node test suite.
 
