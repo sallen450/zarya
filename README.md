@@ -7,7 +7,7 @@ A simple CLI for scaffolding node test suite.
 Prerequisites: [Node.js](https://nodejs.org/en/) (>=4.x) .
 
 ``` bash
-$ npm install -g souche-test-cli
+$ npm install -g zarya
 ```
 
 ### Usage
