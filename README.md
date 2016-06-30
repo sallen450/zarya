@@ -14,25 +14,25 @@ $ npm install -g souche-test-cli
 
 #### Init
 ``` bash
-$ stest init
+$ zarya init
 ```
 
 Example:
 
 ``` bash
-$ stest init
+$ zarya init
 ```
 
 #### New case
 ``` bash
 # 在当前目录创建测试文件
-$ stest newcase <test-case-name>
+$ zarya newcase <test-case-name>
 ```
 
 Example:
 
 ``` bash
-$ stest newcase index
+$ zarya newcase index
 ```
 
 ### License
